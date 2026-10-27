@@ -1,5 +1,5 @@
 const passport = require("passport");
-const User = require("../modle/userModle"); // আপনার ইউজার মডেলের পাথ
+const User = require("../modles/user"); // আপনার ইউজার মডেলের পাথ
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 

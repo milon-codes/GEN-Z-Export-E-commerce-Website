@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const User = require("../modle/userModle");
+const User = require("../modle/user");
 const { successResponse, errorResponse } = require("./responseController");
 const { jwtSecretKey, jwtRefreshSecretKey } = require("../secret");
 const {

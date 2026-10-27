@@ -1,26 +1,23 @@
 const createError = require("http-errors");
-const User = require("../modle/userModle");
+const User = require("../modles/user");
 const { mongoose } = require("mongoose");
 
-
 const findWithId = async (Modle, id, options = {}) => {
-    try {
+  try {
+    const item = await Modle.findById(id, options);
 
-        const item = await Modle.findById(id, options);
-
-        if (!item) {
-            throw createError(404, `${Modle.modelName} dose not exisy with this Id`);
-        }
-        return item;
-    } catch (error) {
-        if (error instanceof mongoose.Error) {
-            throw createError(400, `Invalid ${Modle.modelName} Id`);
-        };
-        throw error;
+    if (!item) {
+      throw createError(404, `${Modle.modelName} dose not exisy with this Id`);
     }
+    return item;
+  } catch (error) {
+    if (error instanceof mongoose.Error) {
+      throw createError(400, `Invalid ${Modle.modelName} Id`);
+    }
+    throw error;
+  }
 };
 
-
 module.exports = {
-    findWithId
-}
+  findWithId,
+};

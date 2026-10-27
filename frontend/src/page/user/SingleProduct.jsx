@@ -11,20 +11,16 @@ import {
   FaQuestionCircle,
   FaCommentDots,
   FaPaperPlane,
+  FaChevronLeft,
+  FaChevronRight,
+  FaExpand,
+  FaTimes,
 } from "react-icons/fa";
-import {
-  FiSearch,
-  FiSliders,
-  FiEye,
-  FiShoppingCart,
-  FiChevronDown,
-  FiX,
-} from "react-icons/fi";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+
 import ProductCard from "./ProductCart";
 
 const SingleProduct = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const {
     allProduct = [],
     searchQuery = "",
@@ -41,21 +37,26 @@ const SingleProduct = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
 
+  // 🖼️ স্লাইডার ও গ্যালারি স্টেট
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+
   // 💬 কাস্টমার Q&A এবং রিভিউ স্টেট
   const [questionInput, setQuestionInput] = useState("");
   const [questions, setQuestions] = useState([
     {
       id: 1,
       user: "রাকিব হাসান",
-      question: "এটার কালার কি ওয়াশ করলে উঠে যাবে?",
+      question: "এটার কালার কি ওয়াশ করলে উঠে যাবে?",
       answer:
-        "না ভাইয়া, এটি প্রিমিয়াম কালার ফাস্টনেস গ্যারান্টিযুক্ত ফ্যাব্রিক।",
+        "না ভাইয়া, এটি প্রিমিয়াম কালার ফাস্টনেস গ্যারান্টিযুক্ত ফ্যাব্রিক।",
     },
     {
       id: 2,
       user: "আরিফ আহমেদ",
       question: "ঢাকা সিটির বাইরে ডেলিভারি দিতে কতদিন লাগবে?",
-      answer: "ঢাকার বাইরে সাধারণত ২-৩ কার্যদিবসের মধ্যে ডেলিভারি পেয়ে যাবেন।",
+      answer: "ঢাকার বাইরে সাধারণত ২-৩ কার্যদিবসের মধ্যে ডেলিভারি পেয়ে যাবেন।",
     },
   ]);
 
@@ -67,34 +68,54 @@ const SingleProduct = () => {
       user: "মাহিন খান",
       rating: 5,
       comment:
-        "অসাধারণ কোয়ালিটি! ঠিক যেমনটা ছবিতে দেখেছি তেমনটাই পেয়েছি। ধন্যবাদ!",
+        "অসাধারণ কোয়ালিটি! ঠিক যেমনটা ছবিতে দেখেছি তেমনটাই পেয়েছি। ধন্যবাদ!",
       date: "12 July 2026",
     },
     {
       id: 2,
       user: "জসিম উদ্দিন",
       rating: 4,
-      comment: "ফিটিং একদম পারফেক্ট। কাপড়টাও বেশ আরামদায়ক।",
+      comment: "ফিটিং একদম পারফেক্ট। কাপড়টাও বেশ আরামদায়ক।",
       date: "05 July 2026",
     },
   ]);
 
-  // string বা number আইডি মিসম্যাচ এড়াতে `==` ব্যবহার করা হয়েছে
-  const product = allProduct.find((p) => p.id == id);
+  const product = allProduct.find((p) => p.slug == slug);
 
-  // 🔄 ১. Related Products (একই ক্যাটাগরির প্রোডাক্ট, বর্তমানটি বাদে)
+  // 🔄 প্রোডাক্ট চেঞ্জ হলে ইমেজ ইনডেক্স রিসেট
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [slug]);
+
+  // ⏱️ Auto Slide Logic (৩ সেকেন্ড পর পর স্লাইড হবে)
+  useEffect(() => {
+    let interval;
+    const imagesList = product?.images || [];
+
+    if (isAutoPlay && imagesList.length > 1) {
+      interval = setInterval(() => {
+        setActiveImageIndex((prevIndex) =>
+          prevIndex === imagesList.length - 1 ? 0 : prevIndex + 1,
+        );
+      }, 3500);
+    }
+
+    return () => clearInterval(interval);
+  }, [isAutoPlay, product?.images]);
+
+  // 🔄 ১. Related Products (একই ক্যাটাগরির প্রোডাক্ট)
   const relatedProducts = useMemo(() => {
     if (!product) return [];
     return allProduct
-      .filter((p) => p.category === product.category && p.id != product.id)
+      .filter((p) => p.category === product.category && p.slug != product.slug)
       .slice(0, 4);
   }, [allProduct, product]);
 
-  // 🌍 ২. Other Categories Products (অন্যান্য ভিন্ন ক্যাটাগরির প্রোডাক্ট)
+  // 🌍 ২. Other Categories Products
   const otherCategoriesProducts = useMemo(() => {
     if (!product) return [];
     return allProduct
-      .filter((p) => p.category !== product.category && p.id != product.id)
+      .filter((p) => p.category !== product.category && p.slug != product.slug)
       .slice(0, 4);
   }, [allProduct, product]);
 
@@ -129,7 +150,20 @@ const SingleProduct = () => {
     }
   };
 
-  // ❓ নতুন প্রশ্ন সাবমিট করার ফাংশন
+  const handleNextImage = () => {
+    if (!product.images?.length) return;
+    setActiveImageIndex((prev) =>
+      prev === product.images.length - 1 ? 0 : prev + 1,
+    );
+  };
+
+  const handlePrevImage = () => {
+    if (!product.images?.length) return;
+    setActiveImageIndex((prev) =>
+      prev === 0 ? product.images.length - 1 : prev - 1,
+    );
+  };
+
   const handleAskQuestion = (e) => {
     e.preventDefault();
     if (!questionInput.trim()) return;
@@ -145,7 +179,6 @@ const SingleProduct = () => {
     setQuestionInput("");
   };
 
-  // ⭐ নতুন রিভিউ সাবমিট করার ফাংশន
   const handleAddReview = (e) => {
     e.preventDefault();
     if (!reviewInput.trim()) return;
@@ -161,6 +194,11 @@ const SingleProduct = () => {
     ]);
     setReviewInput("");
   };
+
+  const imagesList =
+    product.images && product.images.length > 0
+      ? product.images
+      : [{ url: product.image || "" }];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pt-28 md:pt-32 pb-16 px-4 md:px-8 transition-colors duration-500">
@@ -179,21 +217,88 @@ const SingleProduct = () => {
 
         {/* 📦 মেইন প্রোডাক্ট ডিসপ্লে গ্রিড */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 bg-white dark:bg-zinc-900 rounded-3xl p-5 md:p-8 border border-slate-200/60 dark:border-zinc-800 shadow-sm">
-          {/* ইমেজ সেকশন */}
-          <div className="w-full flex items-center justify-center bg-slate-100 dark:bg-zinc-800/40 rounded-2xl border border-slate-200/30 dark:border-zinc-800/50 overflow-hidden relative group aspect-square">
-            {product.image ? (
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            ) : (
-              <span className="text-slate-400 text-sm">No Preview Image</span>
-            )}
-            {discountPercent > 0 && (
-              <span className="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-lg tracking-wider shadow-md">
-                Save {discountPercent}%
-              </span>
+          {/* 📸 এডভান্সড প্রোডাক্ট ইমেজ গ্যালারি ও স্লাইডার সেকশন */}
+          <div className="w-full space-y-4">
+            {/* মেইন প্রিভিউ ইমেজ */}
+            <div
+              className="w-full flex items-center justify-center bg-slate-100 dark:bg-zinc-800/40 rounded-2xl border border-slate-200/30 dark:border-zinc-800/50 overflow-hidden relative group aspect-square select-none"
+              onMouseEnter={() => setIsAutoPlay(false)}
+              onMouseLeave={() => setIsAutoPlay(true)}
+            >
+              {imagesList[activeImageIndex]?.url ? (
+                <img
+                  src={imagesList[activeImageIndex].url}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-all duration-500 ease-in-out cursor-pointer"
+                  onClick={() => setIsZoomOpen(true)}
+                />
+              ) : (
+                <span className="text-slate-400 text-sm">No Preview Image</span>
+              )}
+
+              {/* 🏷️ ডিসকাউন্ট ব্যাজ */}
+              {discountPercent > 0 && (
+                <span className="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-lg tracking-wider shadow-md z-10">
+                  Save {discountPercent}%
+                </span>
+              )}
+
+              {/* 🔢 ইমেজ কাউন্টার ব্যাজ (যেমন: 1 / 4) */}
+              {imagesList.length > 1 && (
+                <span className="absolute top-4 right-4 bg-zinc-950/70 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/10 z-10">
+                  {activeImageIndex + 1} / {imagesList.length}
+                </span>
+              )}
+
+              {/* 🔍 জুম করার বাটন */}
+              <button
+                onClick={() => setIsZoomOpen(true)}
+                className="absolute bottom-4 right-4 w-9 h-9 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md text-slate-800 dark:text-zinc-200 rounded-xl flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#C5A059] hover:text-white z-10"
+                title="Zoom Image"
+              >
+                <FaExpand size={13} />
+              </button>
+
+              {/* ⬅️ ➡️ স্লাইডার নেভিগেশন বাটন */}
+              {imagesList.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md text-slate-800 dark:text-zinc-200 rounded-xl flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#C5A059] hover:text-white z-10"
+                  >
+                    <FaChevronLeft size={12} />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md text-slate-800 dark:text-zinc-200 rounded-xl flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#C5A059] hover:text-white z-10"
+                  >
+                    <FaChevronRight size={12} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* 🖼️ থাম্বনেইল প্রিভিউ ট্র্যাক (Bottom Previews) */}
+            {imagesList.length > 1 && (
+              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+                {imagesList.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+                      activeImageIndex === idx
+                        ? "border-[#C5A059] scale-95 shadow-md ring-2 ring-[#C5A059]/30"
+                        : "border-slate-200 dark:border-zinc-800 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img.url || img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
@@ -245,7 +350,11 @@ const SingleProduct = () => {
                       <button
                         key={color}
                         onClick={() => setSelectedColor(color)}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all flex items-center gap-1.5 ${selectedColor === color ? "bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-md" : "bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800"}`}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all flex items-center gap-1.5 ${
+                          selectedColor === color
+                            ? "bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-md"
+                            : "bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800"
+                        }`}
                       >
                         {selectedColor === color && <FaCheck size={8} />}{" "}
                         {color}
@@ -265,7 +374,11 @@ const SingleProduct = () => {
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`w-10 h-10 text-xs font-bold rounded-xl border flex items-center justify-center transition-all ${selectedSize === size ? "bg-[#C5A059] border-[#C5A059] text-zinc-950 shadow-md scale-105" : "bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800"}`}
+                        className={`w-10 h-10 text-xs font-bold rounded-xl border flex items-center justify-center transition-all ${
+                          selectedSize === size
+                            ? "bg-[#C5A059] border-[#C5A059] text-zinc-950 shadow-md scale-105"
+                            : "bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800"
+                        }`}
                       >
                         {size}
                       </button>
@@ -310,8 +423,9 @@ const SingleProduct = () => {
                   </button>
                 </div>
                 <button
+                  onClick={() => addToCart(product)}
                   disabled={product.stock === 0}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl shadow-md disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 text-xs font-bold rounded-xl shadow-md disabled:opacity-50 active:scale-95 transition-all"
                 >
                   <FaShoppingBag size={12} /> Add to Bag
                 </button>
@@ -319,6 +433,28 @@ const SingleProduct = () => {
             </div>
           </div>
         </div>
+
+        {/* ================= 🔎 FULL-SCREEN ZOOM MODAL (LIGHTBOX) ================= */}
+        {isZoomOpen && (
+          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+            <button
+              onClick={() => setIsZoomOpen(false)}
+              className="absolute top-6 right-6 text-white text-xl bg-zinc-800/80 p-3 rounded-full hover:bg-rose-600 transition-colors z-50"
+            >
+              <FaTimes />
+            </button>
+            <div className="relative max-w-4xl w-full max-h-[85vh] flex items-center justify-center">
+              <img
+                src={
+                  imagesList[activeImageIndex]?.url ||
+                  imagesList[activeImageIndex]
+                }
+                alt="Enlarged view"
+                className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+              />
+            </div>
+          </div>
+        )}
 
         {/* ================= 📊 TAB MATRIX: REVIEWS & QUESTIONS ================= */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -483,7 +619,7 @@ const SingleProduct = () => {
           </div>
         )}
 
-        {/* গ্রিড ২: অন্য সব ক্যাটাগরির প্রোডাক্টস (এক্সপ্লোর ও ডিসকভারি) */}
+        {/* গ্রিড ২: অন্য সব ক্যাটাগরির প্রোডাক্টস */}
         {otherCategoriesProducts.length > 0 && (
           <div className="space-y-6 pt-6">
             <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-zinc-800 pb-4">
@@ -512,112 +648,10 @@ const SingleProduct = () => {
                 );
 
                 return (
-                  <div
-                    key={productId}
-                    className="group bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800/80 rounded-3xl p-3.5 space-y-4 hover:border-[#C5A059]/40 dark:hover:border-[#C5A059]/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.03)] dark:hover:shadow-[0_15px_40px_rgba(0,0,0,0.4)] transition-all duration-500 relative flex flex-col justify-between text-left"
-                  >
-                    <div>
-                      {/* Product Image & Badges */}
-                      <div className="relative aspect-[4/5] bg-slate-100 dark:bg-zinc-950 rounded-2xl overflow-hidden border border-slate-200/30 dark:border-zinc-800/30">
-                        {hasDiscount && (
-                          <span className="absolute top-3 left-3 z-10 px-2 py-1 bg-rose-500 text-white font-black text-[9px] tracking-widest uppercase rounded-lg shadow-sm">
-                            -{discountPercentage}% DROP
-                          </span>
-                        )}
-                        {product.stock <= 0 && (
-                          <span className="absolute inset-0 z-10 bg-zinc-950/60 backdrop-blur-[2px] text-white font-black text-xs tracking-widest uppercase flex items-center justify-center">
-                            OUT OF STOCK
-                          </span>
-                        )}
-
-                        <Link
-                          to={`/shop/category/${product.category}/${product.id}`}
-                        >
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                          />
-                        </Link>
-
-                        {/* Quick Action Overlay (Hover Buttons) */}
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10">
-                          <Link
-                            to={`/shop/category/${product.category}/${product.id}`}
-                            className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-md border border-slate-200/40 dark:border-zinc-800/60 flex items-center justify-center hover:text-[#C5A059] transition-colors"
-                          >
-                            <FiEye size={15} />
-                          </Link>
-
-                          <button
-                            onClick={() =>
-                              isFavorite
-                                ? removeFromFavorites(productId)
-                                : addToFavorites(product)
-                            }
-                            className={`w-10 h-10 rounded-xl shadow-md flex items-center justify-center active:scale-95 transition-all cursor-pointer border ${
-                              isFavorite
-                                ? "bg-zinc-950 text-[#e4024d] border-zinc-950 hover:bg-zinc-900"
-                                : "bg-[#C5A059] text-zinc-950 border-[#C5A059] hover:bg-[#C5A059]/90"
-                            }`}
-                          >
-                            {isFavorite ? (
-                              <FaHeart size={16} />
-                            ) : (
-                              <FaRegHeart size={16} />
-                            )}
-                          </button>
-
-                          <button
-                            onClick={() => addToCart(product)}
-                            disabled={product.stock <= 0}
-                            className="w-10 h-10 rounded-xl bg-[#C5A059] text-zinc-950 shadow-md flex items-center justify-center hover:bg-[#C5A059]/90 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
-                          >
-                            <FiShoppingCart size={15} />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Product Meta Data */}
-                      <div className="space-y-1.5 px-1 mt-3">
-                        <div className="flex items-center justify-between text-[10px] font-black tracking-widest text-[#C5A059] uppercase">
-                          <span>{product.category}</span>
-                          <span className="text-slate-400 dark:text-zinc-500 font-bold">
-                            ⭐ {product.rating || "4.5"}
-                          </span>
-                        </div>
-
-                        <Link to={`/shop/${productId}`}>
-                          <h3 className="font-black uppercase text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white line-clamp-1 group-hover:text-[#C5A059] transition-colors duration-300">
-                            {product.name}
-                          </h3>
-                        </Link>
-
-                        <p className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium line-clamp-1">
-                          {product.description ||
-                            "Premium street culture wear compilation."}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Pricing Section */}
-                    <div className="pt-2 mt-2 border-t border-slate-100 dark:border-zinc-800/60 flex items-baseline justify-between px-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-black text-sm sm:text-base text-slate-900 dark:text-white">
-                          {product.price} {product.currency || "BDT"}
-                        </span>
-                        {hasDiscount && (
-                          <span className="font-bold text-xs text-slate-400 dark:text-zinc-500 line-through">
-                            {product.original_price}
-                          </span>
-                        )}
-                      </div>
-
-                      <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase">
-                        Stock: {product.stock ?? "In Stock"}
-                      </span>
-                    </div>
-                  </div>
+                  <ProductCard
+                    key={product._id || product.id}
+                    product={product}
+                  />
                 );
               })}
             </div>

@@ -138,20 +138,6 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
-  const updateProduct = async (id, updatedData) => {
-    try {
-      const response = await API.put(`/admin/products/${id}`, updatedData);
-      if (response.data.success || response.status === 200) {
-        setAllProduct((prev) =>
-          prev.map((p) => (p._id === id ? { ...p, ...updatedData } : p)),
-        );
-        return { success: true, message: "Product updated successfully!" };
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const deleteProduct = async (id) => {
     try {
       const response = await API.delete(`/admin/products/${id}`);
@@ -164,18 +150,62 @@ export const AdminProvider = ({ children }) => {
   };
 
   // -------------- products -------
-
+  // Create Product
   const createProduct = async (productData) => {
     try {
-      const res = await API.post("/admin/products/create", productData);
+      console.log(productData, "products data");
 
-      console.log(res, "res create");
-      return res.data;
+      const response = await API.post("/admin/products/create", productData);
+
+      if (response.data.success) {
+        const createdProduct = response.data.payload.product;
+
+        // Local State এ নতুন প্রোডাক্ট যোগ করা
+        setAllProduct((prev) => [createdProduct, ...prev]);
+
+        return {
+          success: true,
+          message: response.data.message || "Product created successfully!",
+          product: createdProduct,
+        };
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error creating product:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to create product.",
+      };
     }
   };
 
+  // Update Product
+  const updateProduct = async (id, updatedData) => {
+    try {
+      const response = await API.put(`/admin/products/${id}`, updatedData);
+      console.log(response, "update product");
+
+      if (response.data.success) {
+        const updatedProductFromBackend = response.data.payload.product;
+
+        // Backend থেকে ব্যাক আসা রিয়েল প্রোডাক্ট অবজেক্ট দিয়ে স্টেট সিঙ্ক করা
+        setAllProduct((prev) =>
+          prev.map((p) => (p._id === id ? updatedProductFromBackend : p)),
+        );
+
+        return {
+          success: true,
+          message: response.data.message || "Product updated successfully!",
+          product: updatedProductFromBackend,
+        };
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update product.",
+      };
+    }
+  };
   // ------------------- products call function -----------
 
   // ------------------- banner call function -----------

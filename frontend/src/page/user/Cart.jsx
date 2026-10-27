@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaTrash,
@@ -9,20 +9,22 @@ import {
   FaTicketAlt,
   FaLock,
 } from "react-icons/fa";
-import { ProductContext } from "../../context/ProductContext";
+import { useProducts } from "../../context/ProductContext";
 import { toast } from "sonner";
 
 const Cart = () => {
-  const { cart, setCart } = useContext(ProductContext);
+  const { cart, setCart } = useProducts();
 
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0); // BDT flat discount
 
   // কোয়ান্টিটি হ্যান্ডলার
   const updateQuantity = (id, type) => {
+    console.log(id, "idddd");
+
     setCart((prev) =>
       prev.map((item) => {
-        if (item.id === id) {
+        if (item._id === id) {
           if (type === "inc" && item.quantity < item.stock) {
             return { ...item, quantity: item.quantity + 1 };
           } else if (type === "dec" && item.quantity > 1) {
@@ -85,6 +87,8 @@ const Cart = () => {
     );
   }
 
+  console.log(cart, "cart cc");
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 pt-28 md:p-32 pb-16 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
@@ -126,7 +130,7 @@ const Cart = () => {
                 <div className="flex items-center gap-4 w-full sm:w-auto">
                   <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800/40 rounded-xl overflow-hidden border border-slate-200/30 dark:border-zinc-800/50 shrink-0">
                     <img
-                      src={item.image}
+                      src={item.images[0].url}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -136,21 +140,23 @@ const Cart = () => {
                       {item.category}
                     </span>
                     <h3 className="text-sm font-bold text-slate-950 dark:text-white line-clamp-1">
-                      {item.name}
+                      {item.title}
                     </h3>
 
                     {/* ভেরিয়েন্ট চিপস */}
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {item.size && (
-                        <span className="text-[10px] font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded">
-                          Size: {item.size}
-                        </span>
-                      )}
-                      {item.color && (
-                        <span className="text-[10px] font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded">
-                          Color: {item.color}
-                        </span>
-                      )}
+                      <span className="text-[10px] font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded">
+                        Size:{" "}
+                        {item.sizes.map((s) => (
+                          <span>{s}</span>
+                        ))}
+                      </span>
+                      <span className="text-[10px] font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 px-2 py-0.5 rounded">
+                        Color:{item.colors}
+                        {item.colors.map((c) => (
+                          <span>{c}</span>
+                        ))}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -160,7 +166,7 @@ const Cart = () => {
                   {/* কোয়ান্টিটি চেঞ্জার */}
                   <div className="flex items-center border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 rounded-xl p-0.5 shrink-0">
                     <button
-                      onClick={() => updateQuantity(item.id, "dec")}
+                      onClick={() => updateQuantity(item._id, "dec")}
                       className="p-2 text-slate-500 dark:text-zinc-400 hover:text-[#C5A059]"
                     >
                       <FaMinus size={8} />
@@ -169,7 +175,7 @@ const Cart = () => {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(item.id, "inc")}
+                      onClick={() => updateQuantity(item._id, "inc")}
                       className="p-2 text-slate-500 dark:text-zinc-400 hover:text-[#C5A059]"
                     >
                       <FaPlus size={8} />
@@ -190,7 +196,7 @@ const Cart = () => {
 
                   {/* ডিলিট বাটন */}
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(item._id)}
                     className="p-2.5 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-all"
                   >
                     <FaTrash size={12} />

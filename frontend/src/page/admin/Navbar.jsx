@@ -58,22 +58,69 @@ const Navbar = ({ handleLogout }) => {
     <div className="h-full flex flex-col justify-between">
       <div>
         {/* 🌟 লোগো সেকশন */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 ">
           <Link
             to="/"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 group focus:outline-none"
+            className="flex items-center gap-2 sm:gap-3 group focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg tracking-tighter transition-all duration-500 transform group-hover:rotate-6 bg-zinc-950 dark:bg-[#C5A059] text-[#C5A059] dark:text-neutral-950 shadow-md">
-              GZ
+            {/* Creative Geometric Diamond Badge */}
+            <div className="relative flex items-center justify-center ">
+              {/* Background Subtle Glow on Hover */}
+              <div className="absolute inset-0 rotate-45 bg-[#C5A059]/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Diamond Shape Box */}
+              <div
+                className="relative w-7 sm:w-9 h-7 sm:h-9 rotate-45 border-2 border-[#C5A059] 
+                        bg-slate-100/80 dark:bg-neutral-900/80 backdrop-blur-sm
+                        group-hover:border-neutral-900 dark:group-hover:border-white 
+                        shadow-sm group-hover:shadow-lg group-hover:shadow-[#C5A059]/20 
+                        transition-all duration-500 rounded-lg flex items-center justify-center"
+              >
+                {/* Inner GZ Text */}
+                <span
+                  className="-rotate-45 text-sm sm:text-[17px] font-black text-base text-[#C5A059] 
+                    dark:text-[#E6C687] group-hover:scale-110 transition-all duration-300 select-none"
+                >
+                  GZ
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col items-start leading-none">
-              <span className="font-black text-xl tracking-tighter text-slate-900 dark:text-white transition-colors duration-300 group-hover:text-[#C5A059] dark:group-hover:text-[#C5A059]">
-                GEN-Z
-              </span>
-              <span className="text-[9px] font-bold tracking-[0.25em] uppercase mt-0.5 text-slate-500 dark:text-[#C5A059]/80">
-                Export
-              </span>
+
+            {/* Brand Identity Typography */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 leading-none">
+                {/* High-Contrast Dynamic Title */}
+                <span
+                  className="font-black text-sm sm:text-lg tracking-wide 
+                    text-neutral-900 dark:text-neutral-100 
+                    group-hover:text-[#C5A059] dark:group-hover:text-[#E6C687] 
+                    transition-colors duration-300 drop-shadow-xs"
+                >
+                  GEN
+                  <span className="text-[#C5A059] group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                    -
+                  </span>
+                  Z
+                </span>
+
+                {/* Eye-Catching Rotating Diamond Accent */}
+                <span className="w-2 h-2 rotate-45 bg-[#C5A059] shadow-md transition-all duration-500 group-hover:scale-125 group-hover:rotate-[225deg]" />
+              </div>
+
+              {/* EXPORT Subtitle */}
+              <div className="flex items-center ml-0.5">
+                <span
+                  className="text-[7px] sm:text-[9px] font-extrabold tracking-[0.35em] uppercase 
+                    text-[#C5A059] 
+                    group-hover:text-neutral-950 dark:group-hover:text-white 
+                    transition-colors duration-300"
+                >
+                  EXPORT
+                </span>
+
+                {/* Expanding Decorative Glow Line */}
+                <span className="h-[2px] w-2 bg-[#C5A059] opacity-80 group-hover:w-4 transition-all duration-300 shadow-[0_0_6px_#C5A059]" />
+              </div>
             </div>
           </Link>
         </div>

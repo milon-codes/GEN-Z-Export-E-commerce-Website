@@ -42,6 +42,8 @@ import OAuthSuccess from "../page/user/OAuthSuccess";
 import Terms from "../page/user/Trams";
 import CustomerChatbot from "../components/CustomerChatbot";
 import AdminProductGenerator from "../page/admin/AdminProductGenerator";
+import SSLPaymentPage from "../page/user/SSLPaymentPage";
+import OrderSuccess from "../page/user/OrderSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -61,7 +63,7 @@ export const router = createBrowserRouter([
         element: <OAuthSuccess />,
       },
       {
-        path: "/shop/category/:category/:id",
+        path: "/shop/category/:category/:slug",
         element: <SingleProduct />,
       },
       {
@@ -88,6 +90,14 @@ export const router = createBrowserRouter([
       {
         path: "/chat",
         element: <CustomerChatbot />,
+      },
+      {
+        path: "/ssl",
+        element: <SSLPaymentPage />,
+      },
+      {
+        path: "/order-success",
+        element: <OrderSuccess />,
       },
       {
         path: "/privacy-policy",
@@ -120,6 +130,7 @@ export const router = createBrowserRouter([
         path: "/checkout",
         element: <Checkout />,
       },
+
       {
         path: "/dashboard",
         element: <Dashboard />,
@@ -169,6 +180,7 @@ export const router = createBrowserRouter([
             path: "product-create",
             element: <ProductCreate />,
           },
+
           {
             path: "genared-product",
             element: <AdminProductGenerator />,

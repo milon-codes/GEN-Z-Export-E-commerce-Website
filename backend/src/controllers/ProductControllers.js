@@ -2,10 +2,10 @@ const createError = require("http-errors");
 const { successResponse } = require("./responseController");
 const { findWithId } = require("../services/findWithId");
 const { deleteImage } = require("../helper/deleteImage");
-const Products = require("../modle/productModle");
-const Cart = require("../modle/cart");
-const Order = require("../modle/order");
-const Subscribe = require("../modle/subscribe");
+const Products = require("../modles/product");
+const Cart = require("../modles/cart");
+const Order = require("../modles/order");
+const Subscribe = require("../modles/subscribe");
 const cloudinary = require("../config/cloudinary");
 
 // get all product

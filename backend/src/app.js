@@ -8,6 +8,8 @@ require("dotenv").config();
 
 const authRouter = require("./routes/authRoutes");
 const productRouter = require("./routes/productRoutes");
+const orderRouter = require("./routes/orderRoutes");
+const paymentRouter = require("./routes/paymentRoutes");
 const chatRouter = require("./routes/aiRoutes");
 const bannerRouter = require("./routes/bannerRoute");
 const adminRouter = require("./routes/adminRoutes");
@@ -67,6 +69,12 @@ app.use("/api/auth", authRouter);
 
 // Products Routers
 app.use("/api/products", productRouter);
+
+// products Order routes
+app.use("/api/orders", orderRouter);
+
+// payments routes
+app.use("/api/payment", paymentRouter);
 
 // ai chat route
 app.use("/api/ai", chatRouter);

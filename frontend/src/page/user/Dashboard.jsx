@@ -148,11 +148,15 @@ const Dashboard = () => {
         </div>
         <ul className="flex items-center gap-2">
           <li>
-            <Link to={"/"}>All Drops</Link>
+            <Link
+              to={"/"}
+              className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-sm font-medium tracking-wide transition-all duration-300 relative flex items-center gap-2 hover:scale-105
+             text-white bg-neutral-900 dark:bg-[#C5A059] dark:text-neutral-950 shadow-sm text-neutral-600"
+            >
+              All Drops
+            </Link>
           </li>
-          <li>
-            <Link to={"/shop"}>Shop</Link>
-          </li>
+
           <li>
             {/* থিম টগল বাটন */}
             <button
@@ -186,7 +190,7 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 mt-5">
         {/* ================= HEADER HERO BANNER ================= */}
-        <div className="relative rounded-[2rem] bg-neutral-900 border border-neutral-800 p-6 sm:p-10 overflow-hidden shadow-xl">
+        <div className="relative rounded-[2rem] bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-900 p-6 sm:p-10 overflow-hidden shadow-xl">
           <div className="absolute -top-20 -left-20 w-96 h-96 bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#C5A059]/5 rounded-full blur-[80px] pointer-events-none" />
 

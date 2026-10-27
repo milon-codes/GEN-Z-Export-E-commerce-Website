@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { jwtSecretKey, jwtRefreshSecretKey } = require("../secret");
 const { setAuthCookie } = require("../helper/cookieHelper");
-const User = require("../modle/userModle");
+const User = require("../modles/user");
 const {
   createJsonWebToken,
   verifyJsonWebToken,

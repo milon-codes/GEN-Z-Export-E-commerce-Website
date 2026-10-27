@@ -23,7 +23,7 @@ export default function Navbar1({
   onCartOpen = () => {},
 }) {
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, userLogout } = useAuth();
   const navigate = useNavigate();
 
   console.log(user);
@@ -74,8 +74,17 @@ export default function Navbar1({
   }, []);
 
   const handleLogout = () => {
-    setIsMenuOpen(false);
-    console.log("click");
+    try {
+      const res = userLogout();
+      console.log(res, "log");
+
+      if (res.success) {
+        setIsMenuOpen(false);
+        alert(res.message);
+      }
+    } catch (error) {
+      console.log(error, "error");
+    }
   };
 
   return (
@@ -258,13 +267,13 @@ export default function Navbar1({
                       <div className="relative w-9 h-9">
                         {user?.photoURL ? (
                           <img
-                            src={user.photoURL}
-                            alt={user?.displayName || "Profile"}
+                            src={user?.avater}
+                            alt={user?.name}
                             className="w-full h-full rounded-full object-cover border-2 border-[#C5A059] group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
                           <div className="w-full h-full rounded-full bg-[#C5A059] text-neutral-950 font-black text-sm flex items-center justify-center border-2 border-[#C5A059]">
-                            {(user?.displayName || user?.email || "U")
+                            {(user?.name || user?.email || "U")
                               .charAt(0)
                               .toUpperCase()}
                           </div>
@@ -500,7 +509,7 @@ export default function Navbar1({
                 >
                   {user?.role === "admin" && (
                     <Link
-                      to="/admin"
+                      to="/admin-dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="w-full py-2.5 px-3 bg-[#C5A059]/10 text-[#C5A059] border border-[#C5A059]/30 rounded-xl font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:bg-[#C5A059]/20 transition-all active:scale-[0.98]"
                     >

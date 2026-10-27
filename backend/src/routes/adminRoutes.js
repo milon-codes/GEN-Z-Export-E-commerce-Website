@@ -1,76 +1,57 @@
 const express = require("express");
+const router = express.Router();
 
+// Controllers
 const {
   getUsers,
   userFindWithId,
   addUsers,
   userUpdateWithId,
   userDeleteWithId,
-
-  // products
 } = require("../controllers/admin/adminControllers");
 
 const {
   getAllProduct,
   createProducts,
   deleteProducts,
-
-  updateProducts,
-
+  updateProduct,
   getOrderHistory,
 } = require("../controllers/admin/productControllers");
 
-const {
-  protect,
-  isAdmin,
-  isLoggedOut,
-} = require("../middlewares/authMiddleware");
-
+// Middlewares
+const { protect, isAdmin } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
-const route = express.Router();
+// Base path: /api/admin
+// Apply authentication & admin authorization to all admin routes
+router.use(protect, isAdmin);
 
-// route start /api/admin
+// ==========================================
+//               USER ROUTES
+// ==========================================
+router.get("/users", getUsers);
+router.get("/users/:id", userFindWithId);
+router.post("/users/add", addUsers);
+router.put("/users/:id", userUpdateWithId);
+router.delete("/users/:id", userDeleteWithId);
 
-// --------------- user router start -----------
-// find all user
-route.get("/users", protect, isAdmin, getUsers);
+// ==========================================
+//              ORDER ROUTES
+// ==========================================
+// Always keep fixed routes ABOVE parameterized (:id) product routes!
+router.get("/orders", getOrderHistory);
 
-// find user with this id
-route.get("/users/:id", protect, userFindWithId);
+// ==========================================
+//             PRODUCT ROUTES
+// ==========================================
+router.get("/products", getAllProduct);
+router.post("/products/create", upload.array("images", 5), createProducts);
+router.put("/products/:id", upload.array("images", 5), updateProduct);
+router.delete("/products/:id", deleteProducts);
 
-// add user
-route.post("/users/add", protect, isAdmin, addUsers);
+// ==========================================
+//              BANNER ROUTES
+// ==========================================
+// Future banner routes will go here
 
-// update user with this id
-route.put("/users/:id", protect, userUpdateWithId);
-
-// delete user wiyh this id
-route.delete("/users/:id", protect, userDeleteWithId);
-
-// ----------------- user router close ------------------
-
-///----------------------- products router start ----------------
-
-// get all products
-route.get("/products", getAllProduct);
-
-// create product
-route.post("/products/create", upload.single("image"), createProducts);
-
-// get all order access only admin
-route.get("/products/orders", getOrderHistory);
-
-// update product
-route.put("/products/:id", updateProducts);
-
-// delete product
-route.delete("/products/:id", deleteProducts);
-
-// ----------------- products router close --------------------
-
-///----------------------- banner router start ----------------
-
-// ----------------- banner router close --------------------
-
-module.exports = route;
+module.exports = router;

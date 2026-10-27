@@ -178,6 +178,69 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
+  ///////////////////////////////////////
+
+  // ১. কার্ট খালি করার ফাংশন
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart"); // যদি LocalStorage ব্যবহার করে থাকেন
+  };
+
+  // ২. backend API-তে অর্ডার সাবমিট করার ফাংশন
+  const placeOrder = async (orderData) => {
+    setIsLoading(true);
+    try {
+      // আপনার backend URL অনুযায়ী API endpoint পরিবর্তন করে নেবেন
+      const response = await API.post("/orders/create", orderData);
+      console.log(response, "order responce");
+
+      if (response.status === 200 || response.status === 201) {
+        clearCart(); // অর্ডার সফল হলে কার্ট ক্লিয়ার হয়ে যাবে
+        return { success: true, data: response.data };
+      }
+    } catch (error) {
+      console.error("Order submission failed:", error);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          "Order creation failed. Please try again.",
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // payment method\
+
+  const initOnlinePayment = async (orderPayload) => {
+    try {
+      // আপনার ব্যাকএন্ডের অনলাইন পেমেন্ট ইনিশিয়াল এপিআই কল
+      const response = await axios.post(
+        "http://localhost:5000/api/payment/initiate-payment",
+        orderPayload,
+      );
+
+      if (response.data?.success && response.data?.url) {
+        // পেমেন্ট গেটওয়ে পেজে রিডাইরেক্ট
+        window.location.href = response.data.url;
+      } else {
+        alert(
+          response.data?.message ||
+            "অনলাইন পেমেন্ট গেটওয়েতে সমস্যা হচ্ছে, আবার চেষ্টা করুন।",
+        );
+      }
+    } catch (error) {
+      console.error("Online payment error:", error);
+      alert(
+        error.response?.data?.message ||
+          "পেমেন্ট গেটওয়ে সার্ভারে সংযোগ করা যায়নি।",
+      );
+    }
+  };
+
+  /////////////////////////////////
+
   // 📦 Provider Value
   const productsInfo = {
     allProduct,
@@ -187,6 +250,12 @@ export const ProductProvider = ({ children }) => {
     setSearchQuery,
     cart,
     setCart,
+    //
+    clearCart,
+    placeOrder,
+    // payment
+    initOnlinePayment,
+    //
     addToCart,
     removeFromCart,
     favorites,
