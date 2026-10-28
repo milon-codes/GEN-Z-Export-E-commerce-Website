@@ -331,6 +331,8 @@ const forgotPassword = async (req, res, next) => {
     try {
       await sendEmail(emailData);
     } catch (emailError) {
+      console.log(emailError, "emailError");
+
       next(createError(500, "Failed to send varification email."));
       return;
     }

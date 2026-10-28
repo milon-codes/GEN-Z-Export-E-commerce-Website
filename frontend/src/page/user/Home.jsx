@@ -221,7 +221,6 @@ const Home = () => {
           <span className="text-sm font-semibold tracking-wide uppercase">
             Ask AI
           </span>
-          d
         </button>
 
         {/* AI Chat Modal */}
