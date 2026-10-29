@@ -857,8 +857,7 @@ const UpdateProduct = ({ product, isOpen, onClose, onUpdateSuccess }) => {
                   <option value="panjabi">Panjabi</option>
                   <option value="shirt">Shirt</option>
                   <option value="t-shirt">T-Shirt</option>
-                  <option value="hoodie">Hoodie</option>
-                  <option value="saree">Saree</option>
+                  <option value="pant">Pant</option>
                 </select>
               </div>
             </div>
